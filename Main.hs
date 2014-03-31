@@ -1,4 +1,5 @@
 import System.Environment
+import Data.Char (ord, chr)
 
 bfmachine = ((repeat 0), 0, (repeat 0))
 type BFmachine = ([Int], Int, [Int])
@@ -23,7 +24,8 @@ endOfProgram program@(_,x,_)
     | x == '~'  = True
     | otherwise = False
 
-printLocalMachine machine@(prev, current, next) = print $ (reverse (take 10 prev), current, take 10 next)
+printLocalMachine machine@(prev, current, next) = 
+    return (reverse (take 10 prev), current, take 10 next) >>= print >> return machine
 
 scanBCK :: Int -> BFprogram -> BFprogram
 scanBCK n program
@@ -41,11 +43,13 @@ scanFWD n program
     | otherwise                                = scanFWD n $ programFWD program
 
 execCommand machine command
-    | command == '<' = pointerLeft machine
-    | command == '>' = pointerRight machine
-    | command == '+' = increment machine
-    | command == '-' = decrement machine
-    | otherwise      = machine
+    | command == '<' = return $ pointerLeft machine
+    | command == '>' = return $ pointerRight machine
+    | command == '+' = return $ increment machine
+    | command == '-' = return $ decrement machine
+    | command == ',' = getCharBF machine
+    | command == '.' = putCharBF machine
+    | otherwise      = return machine 
 
 progCommand machine program
     | (currentSymbol program) == '[' && (deref machine) /= 0 = program
@@ -54,26 +58,29 @@ progCommand machine program
     | (currentSymbol program) == ']' && (deref machine) == 0 = program
     | otherwise      = program
     
-{--
-ioCommand machine
-    | command == '.' = getCharBF machine
-    | command == ',' = putCharBF machine
-    | otherwise      = return machine 
---}
+getCharBF machine@(prev,_,next) = getChar >>= \x -> return (prev,(ord x),next)
+putCharBF machine = putStr [(chr.deref $ machine)] >> return machine
 
 loadStringToProgram :: String -> BFprogram
 loadStringToProgram (x:xs) = ([], x, xs)
 
 mainLoop machine program 
-    | endOfProgram program = machine
+    | endOfProgram program = return machine
     | otherwise = do
-        let newmachine = execCommand machine (currentSymbol program)
+        newmachine <- execCommand machine (currentSymbol program)
         let newprogram = progCommand machine program
         mainLoop newmachine (programFWD newprogram)
 
 main = do
     let program = "++This is my BF program+[>>++<+<-<->]+-[~]++"
---    let program = "++[->+++[-]<]+"
+    let helloworld = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+
     print "--newprogram--"
     print program
-    printLocalMachine $ mainLoop bfmachine (loadStringToProgram program)
+    mainLoop bfmachine (loadStringToProgram program) >>= printLocalMachine
+    putStrLn ""
+    
+    print "--helloworld--"
+    print helloworld
+    mainLoop bfmachine (loadStringToProgram helloworld) >>= printLocalMachine
+    putStrLn ""
