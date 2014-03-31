@@ -84,3 +84,13 @@ main = do
     print helloworld
     mainLoop bfmachine (loadStringToProgram helloworld) >>= printLocalMachine
     putStrLn ""
+    
+    filename <- getArgs
+    if (length filename /= 1) then print "Invalid filename"
+        else do 
+            programFromFile <- readFile $ head filename
+            print $ filename
+            print programFromFile
+            mainLoop bfmachine (loadStringToProgram programFromFile) >>= printLocalMachine
+            putStrLn ""
+
