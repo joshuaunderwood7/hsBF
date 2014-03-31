@@ -36,4 +36,4 @@ Character	Symantic Meaning:
 The machine is supposed to be able to go forward or backward infinitely. 
 And each memory location stores (big i) Integers. 
 
-Realisticly, the integers and memory is limeted by the computer this is running on.
+Realisticly, the integers and memory is limited by the computer this is running on.
