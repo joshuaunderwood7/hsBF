@@ -72,6 +72,7 @@ mainLoop machine program
         mainLoop newmachine (programFWD newprogram)
 
 main = do
+{--
     let program = "++This is my BF program+[>>++<+<-<->]+-[~]++"
     let helloworld = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
 
@@ -84,7 +85,7 @@ main = do
     print helloworld
     mainLoop bfmachine (loadStringToProgram helloworld) >>= printLocalMachine
     putStrLn ""
-    
+--}    
     filename <- getArgs
     if (length filename /= 1) then print "Invalid filename"
         else do 
@@ -93,4 +94,3 @@ main = do
             print programFromFile
             mainLoop bfmachine (loadStringToProgram programFromFile) >>= printLocalMachine
             putStrLn ""
-
